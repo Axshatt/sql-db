@@ -1,0 +1,17 @@
+import {Client} from "pg";
+
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const pgClient = new Client(process.env.PG_URL)
+
+async function main() {
+    await pgClient.connect();
+    const response = await pgClient.query("SELECT * FROM users")
+    console.log(response.rows);
+    
+}
+
+main()
+
