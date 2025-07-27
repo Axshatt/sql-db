@@ -13,9 +13,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const pg_1 = require("pg");
+const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
+const app = (0, express_1.default)();
+app.use(express_1.default.json());
 const pgClient = new pg_1.Client(process.env.PG_URL);
+//Avoiding SQL injection
+app.post("/user", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield pgClient.connect();
+    const { username, password, email } = req.body;
+    const insertQuery = `INSERT INTO users(username , email ,password) VALUES ($1,$2,$3);`;
+    const response = yield pgClient.query(insertQuery, [username, email, password]);
+    console.log(response.rows);
+    res.send({
+        msg: "Saved Credentials"
+    });
+}));
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         yield pgClient.connect();
@@ -23,4 +37,13 @@ function main() {
         console.log(response.rows);
     });
 }
-main();
+function main2() {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield pgClient.connect();
+        const insertQuery = `INSERT INTO users(username , email ,password)`;
+        const response = yield pgClient.query(insertQuery);
+        console.log(response.rows);
+    });
+}
+// main()
+app.listen(3000);
